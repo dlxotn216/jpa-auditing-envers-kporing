@@ -7,6 +7,8 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
 /**
  * Created by taesu on 2024/02/18.
@@ -20,9 +22,13 @@ class UserSaveServiceTest {
     @Autowired
     private lateinit var userRepository: UserRepository
 
+    @Autowired
+    private lateinit var jdbcTemplate: NamedParameterJdbcTemplate
+
     @BeforeEach
     fun init() {
         userRepository.deleteAll()
+        jdbcTemplate.execute("delete from users_his where 1=1") {}
     }
 
     @Test
@@ -84,5 +90,34 @@ class UserSaveServiceTest {
 
         // then
         assertThat(userRepository.findByUserId("taesu")!!.modifiedAt).isEqualTo(user.modifiedAt)
+    }
+
+
+    @Test
+    fun `조건에 따라 Entity의 변경내역을 저장하지 않는다`() {
+        // given
+        // when
+        val user = userRepository.save(
+            User(
+                userId = "taesu",
+                name = "taesu, lee"
+            ).apply {
+                doSkipRevision()
+            }
+        )
+
+        userRepository.save(user.apply {
+            update("change name", "for testing")
+            doSkipRevision()
+        })
+
+        // then
+        val revisionCount = jdbcTemplate.queryForObject(
+            "select count(*) revision_count from users_his",
+            MapSqlParameterSource()
+        ) { it, _ ->
+            it.getLong("revision_count")
+        } ?: 0L
+        assertThat(revisionCount).isEqualTo(0L)
     }
 }

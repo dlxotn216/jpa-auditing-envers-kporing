@@ -9,10 +9,15 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create-drop
+    open-in-view: false
     properties:
       hibernate:
         jdbc:
           time_zone=UTC:
+      hibernate.envers.autoRegisterListeners: false
+      org.hibernate.envers.audit_table_suffix: _HIS
+      org.hibernate.envers.modified_flag_suffix: _CHANGED
+      org.hibernate.envers.modified_column_naming_strategy: improved
   jackson:
     time-zone: UTC
 

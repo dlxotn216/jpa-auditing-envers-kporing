@@ -32,4 +32,17 @@ class AuditableEntity(
 ) {
     @Transient
     var forceUpdate = false
+        protected set
+
+    @Transient
+    var skipRevision = false
+        protected set
+
+    fun doForceUpdate() {
+        this.forceUpdate = true
+    }
+
+    fun doSkipRevision() {
+        this.skipRevision = true
+    }
 }

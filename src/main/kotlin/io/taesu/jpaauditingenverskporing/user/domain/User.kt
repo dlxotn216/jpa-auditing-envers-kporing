@@ -4,6 +4,7 @@ import io.taesu.jpaauditingenverskporing.app.domain.AuditableEntity
 import jakarta.persistence.*
 import org.hibernate.annotations.DynamicUpdate
 import org.hibernate.annotations.NaturalId
+import org.hibernate.envers.Audited
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import org.springframework.data.jpa.repository.JpaRepository
 
@@ -14,6 +15,7 @@ import org.springframework.data.jpa.repository.JpaRepository
  * @version jpa-auditing-envers-kporing
  * @since jpa-auditing-envers-kporing
  */
+@Audited
 @EntityListeners(value = [AuditingEntityListener::class])
 @Table(name = "users")
 @DynamicUpdate
